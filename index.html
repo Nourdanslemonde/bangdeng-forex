@@ -55,6 +55,72 @@
   section h2{font-size:13px;margin:0 0 12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
   section h2 .emoji{filter:saturate(1.2)}
 
+  /* ===== 구루 / 분석 ===== */
+  .guru-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line2);margin-bottom:14px;flex-wrap:wrap}
+  .guru-tabs button{
+    background:transparent;color:var(--muted);border:0;padding:9px 14px;
+    border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;box-shadow:none;font-size:13px
+  }
+  .guru-tabs button:hover{color:var(--ink);background:var(--line2);transform:none}
+  .guru-tabs button.active{color:var(--grape);background:rgba(122,63,176,.08)}
+  .tab-pane{display:none}
+  .tab-pane.active{display:block}
+
+  .guru-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .guru-card{
+    background:#fffefb;border:1px solid var(--line2);border-radius:10px;padding:14px;
+    transition:transform .15s,box-shadow .15s
+  }
+  .guru-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(122,63,176,.12)}
+  .guru-card .name{font-weight:700;font-size:15px;color:var(--ink)}
+  .guru-card .title{font-size:11px;color:var(--grape);margin:3px 0 7px;font-weight:700;letter-spacing:.02em}
+  .guru-card .about{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+  .guru-card .links{display:flex;gap:5px;flex-wrap:wrap}
+  .guru-card .links a{
+    font-size:11px;padding:3px 9px;background:rgba(122,63,176,.08);
+    color:var(--grape);border-radius:6px;font-weight:600
+  }
+  .guru-card .links a:hover{background:rgba(122,63,176,.18);text-decoration:none}
+
+  .news-controls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+  .news-controls .chip{
+    font-size:12px;padding:6px 12px;background:transparent;border:1px solid var(--line);
+    color:var(--ink);border-radius:999px;cursor:pointer;font-weight:600;box-shadow:none;transform:none
+  }
+  .news-controls .chip:hover{transform:none;background:var(--line2)}
+  .news-controls .chip.active{background:var(--grape);color:#fff;border-color:var(--grape)}
+  .news-list{display:grid;gap:8px;max-height:480px;overflow-y:auto;padding-right:4px}
+  .news-item{
+    padding:11px 13px;background:#fffefb;border:1px solid var(--line2);border-radius:8px;
+    display:block;color:var(--ink);transition:border-color .15s,background .15s
+  }
+  .news-item:hover{border-color:var(--grape);background:rgba(122,63,176,.03);text-decoration:none}
+  .news-item .nt{font-weight:600;font-size:13px;line-height:1.4;color:var(--ink)}
+  .news-item .nm{font-size:11px;color:var(--muted);margin-top:5px}
+  .news-item .nm b{color:var(--grape);font-weight:700}
+  .news-status{font-size:12px;color:var(--muted);text-align:center;padding:18px}
+
+  .note-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .note-form input,.note-form textarea{
+    width:100%;background:#fffefb;border:1px solid var(--line);color:var(--ink);
+    padding:9px 11px;border-radius:7px;font:inherit
+  }
+  .note-form input:focus,.note-form textarea:focus{outline:none;border-color:var(--grape);box-shadow:0 0 0 3px rgba(122,63,176,.12)}
+  .note-form textarea{grid-column:1/-1;min-height:54px;resize:vertical}
+  .note-form .form-actions{grid-column:1/-1}
+  .notes-list{display:grid;gap:8px}
+  .note-item{
+    padding:11px 13px;background:#fffefb;border:1px solid var(--line2);border-radius:8px;
+    position:relative;padding-right:32px
+  }
+  .note-item .nt{font-weight:600;font-size:13px}
+  .note-item .nt a{color:var(--ink)}
+  .note-item .nt a:hover{color:var(--grape)}
+  .note-item .nmemo{font-size:12px;color:var(--ink);margin-top:5px;white-space:pre-wrap;line-height:1.5}
+  .note-item .nm{font-size:11px;color:var(--muted);margin-top:5px}
+  .note-item .delete-btn{position:absolute;top:6px;right:6px}
+  @media (max-width:600px){.note-form{grid-template-columns:1fr}}
+
   /* ===== 차트 ===== */
   .chart-board .tv-wrap{
     background:#fffefb;border:1px solid var(--line2);border-radius:10px;
@@ -253,6 +319,42 @@
     </div>
   </section>
 
+  <!-- 구루 & 경제 분석 -->
+  <section>
+    <h2><span class="emoji">📚</span> 구루 & 경제 분석 — 검증된 시장 관찰자</h2>
+    <div class="guru-tabs" id="guru-tabs">
+      <button class="active" data-tab="kr">국내 구루</button>
+      <button data-tab="intl">해외 구루</button>
+      <button data-tab="news">최신 기사</button>
+      <button data-tab="notes">독서 노트</button>
+    </div>
+
+    <div class="tab-pane active" data-pane="kr">
+      <div class="guru-grid" id="kr-grid"></div>
+    </div>
+
+    <div class="tab-pane" data-pane="intl">
+      <div class="guru-grid" id="intl-grid"></div>
+    </div>
+
+    <div class="tab-pane" data-pane="news">
+      <div class="news-controls" id="news-chips"></div>
+      <div class="news-list" id="news-list">
+        <div class="news-status">키워드를 클릭하면 Google News에서 최신 기사를 가져옵니다.</div>
+      </div>
+    </div>
+
+    <div class="tab-pane" data-pane="notes">
+      <form class="note-form" id="note-form">
+        <input id="note-title" placeholder="기사 / 글 제목" required>
+        <input id="note-url" type="url" placeholder="URL (https://...)" required>
+        <textarea id="note-memo" placeholder="요약 / 핵심 포인트 / 내 투자에 어떻게 적용할지"></textarea>
+        <div class="form-actions"><button type="submit">노트 저장</button></div>
+      </form>
+      <div class="notes-list" id="notes-list"></div>
+    </div>
+  </section>
+
   <div class="grid-2">
     <section>
       <h2><span class="emoji">✅</span> 오늘의 룰 체크리스트</h2>
@@ -354,7 +456,39 @@
 <script>
 const STORAGE_KEY = "fx-tracker-v1";
 const CHECK_KEY = "fx-tracker-check-v1";
+const NOTES_KEY = "fx-tracker-notes-v1";
 const TOTAL_RULES = 6;
+
+const GURUS_KR = [
+  {name:"오건영", title:"신한은행 IPS본부장", about:"매크로·환율 베스트셀러 \"환율의 미래\" 저자. 한국에서 가장 널리 인용되는 환율 전문가.", q:"오건영"},
+  {name:"홍춘욱", title:"프리즘투자자문 대표", about:"이코노미스트 출신, 환율과 글로벌 자산 배분에 강함. 유튜브 \"홍춘욱의 경제강의노트\".", q:"홍춘욱"},
+  {name:"김영익", title:"서강대 경제대학원 교수", about:"환율·금리 사이클 분석으로 유명. 한국 거시경제 전망 빈번히 인용.", q:"김영익 경제"},
+  {name:"박종훈", title:"KBS 경제부 기자 / 작가", about:"\"부의 시그널\" 저자. 유튜브 \"박종훈의 경제한방\"에서 거시 흐름 해설.", q:"박종훈 경제한방"},
+  {name:"한상춘", title:"한국경제 논설위원", about:"\"한상춘의 국제경제 읽기\" 장기 연재. 한국경제TV 출연.", q:"한상춘 국제경제"},
+  {name:"김광석", title:"한국경제산업연구원 실장", about:"매크로 트렌드와 산업 분석. \"경제 읽어주는 남자\" 콘텐츠로 알려짐.", q:"김광석 경제"},
+  {name:"이종우", title:"전 IBK투자증권 리서치센터장", about:"국내 시황·환율 칼럼니스트. 보수적이고 균형 있는 분석으로 알려짐.", q:"이종우 시황"}
+];
+
+const GURUS_INTL = [
+  {name:"Brad Setser", title:"Council on Foreign Relations Senior Fellow", about:"전 미 재무부. 자본 흐름·환율 정책 분석가. 블로그 \"Follow the Money\".", url:"https://www.cfr.org/blog/follow-money", q:"Brad Setser"},
+  {name:"Robin Brooks", title:"Brookings Senior Fellow (전 IIF 수석)", about:"환율·국제금융 데이터 분석. X(트위터)에서 USDKRW·DXY 빈번히 다룸.", q:"Robin Brooks economist"},
+  {name:"Michael Pettis", title:"베이징대 / Carnegie Senior Fellow", about:"중국 경제·위안화 권위자. 무역 불균형과 환율 정책 분석.", q:"Michael Pettis"},
+  {name:"Lyn Alden", title:"매크로 분석가 / 펀드 매니저", about:"독립 매크로 리서치. 달러·금·미 부채 사이클 등 장기 매크로 뷰.", url:"https://www.lynalden.com/", q:"Lyn Alden"},
+  {name:"Adam Tooze", title:"컬럼비아대 역사학 교수", about:"역사적 매크로 분석. Substack \"Chartbook\" 매주 발행.", url:"https://adamtooze.substack.com/", q:"Adam Tooze Chartbook"},
+  {name:"George Saravelos", title:"Deutsche Bank Global Head of FX", about:"FX 리서치 보고서가 시장에서 빈번히 인용됨. 달러·엔·위안 코멘트.", q:"George Saravelos FX"},
+  {name:"Mohamed El-Erian", title:"Allianz 수석경제고문", about:"FT 정기 칼럼. 연준·달러·신흥국 시장 분석.", q:"Mohamed El-Erian"},
+  {name:"Stephen Roach", title:"예일대 시니어 펠로우", about:"전 모건스탠리 아시아 회장. 중국·아시아 통화·달러 사이클 분석.", q:"Stephen Roach economist"},
+  {name:"Paul Krugman", title:"NYU 교수 / NYT 칼럼니스트", about:"노벨경제학상. 통화·재정 정책 일반론과 환율 코멘트.", q:"Paul Krugman"}
+];
+
+const NEWS_QUERIES = [
+  {label:"환율 종합", q:"환율 OR 원달러 OR 외환시장", lang:"ko", region:"KR"},
+  {label:"USD/KRW", q:"\"USDKRW\" OR \"won dollar\" exchange", lang:"en-US", region:"US"},
+  {label:"엔화·BOJ", q:"엔화 OR 일본은행 OR BOJ", lang:"ko", region:"KR"},
+  {label:"위안·인민은행", q:"위안화 OR 인민은행 OR \"PBOC yuan\"", lang:"ko", region:"KR"},
+  {label:"FOMC·연준", q:"FOMC OR Powell OR \"Federal Reserve\"", lang:"en-US", region:"US"},
+  {label:"ECB·유로존", q:"ECB OR Lagarde OR \"euro area\"", lang:"en-US", region:"US"}
+];
 
 const pad2 = n => String(n).padStart(2,"0");
 const dateKey = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
@@ -367,6 +501,8 @@ function loadTrades(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)
 function saveTrades(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
 function loadChecks(){ try { return JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; } catch { return {}; } }
 function saveChecks(o){ localStorage.setItem(CHECK_KEY, JSON.stringify(o)); }
+function loadNotes(){ try { return JSON.parse(localStorage.getItem(NOTES_KEY)) || []; } catch { return []; } }
+function saveNotes(list){ localStorage.setItem(NOTES_KEY, JSON.stringify(list)); }
 
 function fmtNum(n, digits=2){
   if (n == null || isNaN(n)) return "-";
@@ -566,6 +702,153 @@ function render(){
   renderGrapes();
 }
 
+/* ===== 구루 카드 ===== */
+function renderGurus(){
+  const krGrid = document.getElementById("kr-grid");
+  const intlGrid = document.getElementById("intl-grid");
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+  function makeCard(g){
+    const card = document.createElement("div");
+    card.className = "guru-card";
+    const links = [];
+    if (g.url) links.push(`<a href="${g.url}" target="_blank" rel="noopener">공식</a>`);
+    links.push(`<a href="https://news.google.com/search?q=${encodeURIComponent(g.q)}&hl=ko&gl=KR&ceid=KR:ko" target="_blank" rel="noopener">기사</a>`);
+    links.push(`<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(g.q)}" target="_blank" rel="noopener">YouTube</a>`);
+    card.innerHTML = `
+      <div class="name">${escapeHtml(g.name)}</div>
+      <div class="title">${escapeHtml(g.title)}</div>
+      <div class="about">${escapeHtml(g.about)}</div>
+      <div class="links">${links.join("")}</div>
+    `;
+    return card;
+  }
+  GURUS_KR.forEach(g=> krGrid.appendChild(makeCard(g)));
+  GURUS_INTL.forEach(g=> intlGrid.appendChild(makeCard(g)));
+}
+
+/* ===== 탭 ===== */
+document.getElementById("guru-tabs").addEventListener("click", e=>{
+  if (e.target.tagName !== "BUTTON") return;
+  const tab = e.target.dataset.tab;
+  document.querySelectorAll("#guru-tabs button").forEach(b=> b.classList.toggle("active", b===e.target));
+  document.querySelectorAll(".tab-pane").forEach(p=> p.classList.toggle("active", p.dataset.pane === tab));
+});
+
+/* ===== 뉴스 피드 (Google News RSS) ===== */
+const chipsEl = document.getElementById("news-chips");
+NEWS_QUERIES.forEach((q,i)=>{
+  const b = document.createElement("button");
+  b.className = "chip" + (i===0?" active":"");
+  b.textContent = q.label; b.dataset.idx = i; b.type = "button";
+  b.addEventListener("click", ()=>{
+    chipsEl.querySelectorAll(".chip").forEach(c=> c.classList.toggle("active", c===b));
+    loadNews(NEWS_QUERIES[i]);
+  });
+  chipsEl.appendChild(b);
+});
+const refreshBtn = document.createElement("button");
+refreshBtn.className = "ghost"; refreshBtn.textContent = "↻ 새로고침"; refreshBtn.type = "button";
+refreshBtn.style.marginLeft = "auto";
+refreshBtn.addEventListener("click", ()=>{
+  const active = chipsEl.querySelector(".chip.active");
+  if (active) loadNews(NEWS_QUERIES[Number(active.dataset.idx)]);
+});
+chipsEl.appendChild(refreshBtn);
+
+async function loadNews(q){
+  const list = document.getElementById("news-list");
+  list.innerHTML = `<div class="news-status">불러오는 중…</div>`;
+  const ceidLang = q.lang.split("-")[0];
+  const newsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q.q)}&hl=${q.lang}&gl=${q.region}&ceid=${q.region}:${ceidLang}`;
+  const fallbackOpen = `https://news.google.com/search?q=${encodeURIComponent(q.q)}&hl=${q.lang}&gl=${q.region}&ceid=${q.region}:${ceidLang}`;
+  const proxies = [
+    `https://corsproxy.io/?${encodeURIComponent(newsUrl)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(newsUrl)}`
+  ];
+  for (const proxyUrl of proxies){
+    try {
+      const res = await fetch(proxyUrl, {cache:"no-store"});
+      if (!res.ok) continue;
+      const text = await res.text();
+      const xml = new DOMParser().parseFromString(text, "text/xml");
+      const items = Array.from(xml.querySelectorAll("item")).slice(0, 20);
+      if (!items.length) continue;
+      list.innerHTML = "";
+      items.forEach(it=>{
+        const title = it.querySelector("title")?.textContent || "";
+        const link = it.querySelector("link")?.textContent || "";
+        const source = it.querySelector("source")?.textContent || "";
+        const dateRaw = it.querySelector("pubDate")?.textContent || "";
+        let dateStr = "";
+        if (dateRaw){
+          const d = new Date(dateRaw);
+          if (!isNaN(d)) dateStr = d.toLocaleString("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+        }
+        const a = document.createElement("a");
+        a.className = "news-item"; a.href = link; a.target = "_blank"; a.rel = "noopener";
+        a.innerHTML = `<div class="nt"></div><div class="nm"></div>`;
+        a.querySelector(".nt").textContent = title;
+        a.querySelector(".nm").innerHTML = `<b></b> · `;
+        a.querySelector(".nm b").textContent = source || "출처 미상";
+        a.querySelector(".nm").append(dateStr);
+        list.appendChild(a);
+      });
+      return;
+    } catch(e){ /* try next proxy */ }
+  }
+  list.innerHTML = `<div class="news-status">자동 로드에 실패했어요. <a href="${fallbackOpen}" target="_blank" rel="noopener">Google News에서 직접 보기 →</a></div>`;
+}
+
+/* ===== 독서 노트 ===== */
+function renderNotes(){
+  const list = document.getElementById("notes-list");
+  const notes = loadNotes();
+  list.innerHTML = "";
+  if (!notes.length){
+    list.innerHTML = `<div class="news-status">아직 저장한 글이 없어요. 위에서 첫 노트를 추가해 보세요 📝</div>`;
+    return;
+  }
+  notes.slice().sort((a,b)=> b.id - a.id).forEach(n=>{
+    const div = document.createElement("div");
+    div.className = "note-item";
+    const a = document.createElement("a");
+    a.href = n.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = n.title;
+    const titleDiv = document.createElement("div"); titleDiv.className = "nt"; titleDiv.appendChild(a);
+    const memoDiv = document.createElement("div"); memoDiv.className = "nmemo"; memoDiv.textContent = n.memo || "";
+    const metaDiv = document.createElement("div"); metaDiv.className = "nm"; metaDiv.textContent = n.date || "";
+    const del = document.createElement("button");
+    del.className = "delete-btn"; del.dataset.id = n.id; del.title = "삭제"; del.textContent = "×";
+    div.appendChild(del); div.appendChild(titleDiv);
+    if (n.memo) div.appendChild(memoDiv);
+    div.appendChild(metaDiv);
+    list.appendChild(div);
+  });
+}
+
+document.getElementById("note-form").addEventListener("submit", e=>{
+  e.preventDefault();
+  const note = {
+    id: Date.now(),
+    title: document.getElementById("note-title").value.trim(),
+    url: document.getElementById("note-url").value.trim(),
+    memo: document.getElementById("note-memo").value.trim(),
+    date: todayStr()
+  };
+  saveNotes(loadNotes().concat(note));
+  document.getElementById("note-form").reset();
+  renderNotes();
+  showToast("노트 저장 완료 📝");
+});
+
+document.getElementById("notes-list").addEventListener("click", e=>{
+  if (e.target.classList.contains("delete-btn")){
+    const id = Number(e.target.dataset.id);
+    if (!confirm("이 노트를 삭제할까요?")) return;
+    saveNotes(loadNotes().filter(n=> n.id !== id));
+    renderNotes();
+  }
+});
+
 /* ===== 폼/액션 ===== */
 document.getElementById("trade-form").addEventListener("submit", e=>{
   e.preventDefault();
@@ -612,7 +895,7 @@ document.getElementById("clear-all").addEventListener("click", ()=>{
 });
 
 document.getElementById("export-json").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify({trades:loadTrades(), checks:loadChecks()}, null, 2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({trades:loadTrades(), checks:loadChecks(), notes:loadNotes()}, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `bangdeng-forex-${todayStr()}.json`; a.click();
@@ -645,7 +928,8 @@ document.getElementById("import-file").addEventListener("change", e=>{
         saveTrades(loadTrades().concat(trades));
       }
       if (data.checks) saveChecks(Object.assign(loadChecks(), data.checks));
-      render();
+      if (data.notes && Array.isArray(data.notes)) saveNotes(loadNotes().concat(data.notes));
+      render(); renderNotes();
     } catch(err){ alert("가져오기 실패: " + err.message); }
   };
   reader.readAsText(file);
@@ -676,6 +960,9 @@ checklist.querySelectorAll("input[type=checkbox]").forEach(cb=>{
 });
 refreshCheckMeta();
 
+renderGurus();
+renderNotes();
+loadNews(NEWS_QUERIES[0]);
 render();
 </script>
 </body>
