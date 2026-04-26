@@ -55,6 +55,15 @@
   section h2{font-size:13px;margin:0 0 12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
   section h2 .emoji{filter:saturate(1.2)}
 
+  /* ===== 차트 ===== */
+  .chart-board .tv-wrap{
+    background:#fffefb;border:1px solid var(--line2);border-radius:10px;
+    padding:6px;overflow:hidden;
+  }
+  .chart-board .tv-wrap > div{height:420px}
+  .chart-meta{margin-top:8px;font-size:11px;color:var(--muted);text-align:right}
+  .chart-meta a{color:var(--muted);text-decoration:underline}
+
   /* ===== 포도송이 ===== */
   .grape-board{
     background:linear-gradient(180deg,#fffaf0 0%, #fdf1e0 100%);
@@ -165,22 +174,49 @@
 
 <main>
 
-  <!-- 포도송이 보드 -->
-  <section class="grape-board">
-    <div class="head">
-      <div>
-        <div class="month" id="month-label"></div>
-        <div class="stat">이번 달 칭찬 스티커 — <b id="stat-full">0</b>알 익음 · <b id="stat-partial">0</b>알 자라는 중 · 남은 빈 알 <b id="stat-empty">0</b></div>
+  <!-- FX 차트 -->
+  <section class="chart-board">
+    <h2><span class="emoji">📈</span> FX 차트 — 원화 대비 USD / EUR / JPY / CNY</h2>
+    <div class="tv-wrap">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+        {
+          "symbols": [
+            ["USD/KRW", "FX_IDC:USDKRW|1Y"],
+            ["EUR/KRW", "FX_IDC:EURKRW|1Y"],
+            ["JPY/KRW", "FX_IDC:JPYKRW|1Y"],
+            ["CNY/KRW", "FX_IDC:CNYKRW|1Y"]
+          ],
+          "chartOnly": false,
+          "width": "100%",
+          "height": "100%",
+          "locale": "kr",
+          "colorTheme": "light",
+          "autosize": true,
+          "showVolume": false,
+          "hideDateRanges": false,
+          "hideMarketStatus": false,
+          "hideSymbolLogo": false,
+          "scalePosition": "right",
+          "scaleMode": "Normal",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+          "fontSize": "11",
+          "noTimeScale": false,
+          "valuesTracking": "1",
+          "changeMode": "price-and-percent",
+          "chartType": "area",
+          "lineWidth": 2,
+          "dateRanges": ["1d|1","1m|30","3m|60","12m|1D","60m|1W","all|1M"],
+          "backgroundColor": "rgba(255, 250, 240, 1)",
+          "lineColor": "rgba(122, 63, 176, 1)",
+          "topColor": "rgba(122, 63, 176, 0.3)",
+          "bottomColor": "rgba(122, 63, 176, 0)"
+        }
+        </script>
       </div>
-      <div class="stat">총 룰 6개 · <b>모두 체크 = 잘 익은 포도</b> · <b>일부만 체크 = 자라는 중</b></div>
     </div>
-    <svg id="grape-svg" class="grape-svg" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div class="legend">
-      <span><span class="sw" style="background:var(--grape-empty);border:1px dashed #c9b3d8"></span>아직 빈 알</span>
-      <span><span class="sw" style="background:var(--grape-light)"></span>자라는 중 (1~5/6)</span>
-      <span><span class="sw" style="background:var(--grape)"></span>잘 익은 포도 (6/6)</span>
-      <span><span class="sw" style="border:2px dashed var(--warn);background:transparent"></span>오늘</span>
-    </div>
+    <div class="chart-meta">데이터 출처 — <a href="https://www.tradingview.com" target="_blank" rel="noopener">TradingView</a> · 매매 기준은 항상 거래 은행 고시 환율로 다시 확인하세요</div>
   </section>
 
   <!-- References -->
@@ -289,6 +325,25 @@
       <button class="ghost" id="export-csv">CSV 내보내기</button>
       <button class="danger" id="clear-all">전체 삭제</button>
       <input type="file" id="import-file" accept=".json" hidden>
+    </div>
+  </section>
+
+  <!-- 포도송이 보드 (하단) -->
+  <section class="grape-board">
+    <h2><span class="emoji">🍇</span> 이번 달 포도송이 — 매일 룰을 지키면 한 알씩 익어요</h2>
+    <div class="head">
+      <div>
+        <div class="month" id="month-label"></div>
+        <div class="stat"><b id="stat-full">0</b>알 익음 · <b id="stat-partial">0</b>알 자라는 중 · 빈 알 <b id="stat-empty">0</b></div>
+      </div>
+      <div class="stat">총 룰 6개 · <b>모두 체크 = 잘 익은 포도</b> · <b>일부만 체크 = 자라는 중</b></div>
+    </div>
+    <svg id="grape-svg" class="grape-svg" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--grape-empty);border:1px dashed #c9b3d8"></span>아직 빈 알</span>
+      <span><span class="sw" style="background:var(--grape-light)"></span>자라는 중 (1~5/6)</span>
+      <span><span class="sw" style="background:var(--grape)"></span>잘 익은 포도 (6/6)</span>
+      <span><span class="sw" style="border:2px dashed var(--warn);background:transparent"></span>오늘</span>
     </div>
   </section>
 
