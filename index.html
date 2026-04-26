@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>방뎅Forex — 포도알 환투자 다이어리</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{
+    --bg:#fdf6ec;            /* cream paper */
+    --paper:#fffaf0;
+    --ink:#2a2438;
+    --muted:#7a6f86;
+    --line:#ead7c2;
+    --line2:#f0e0c8;
+    --grape:#7a3fb0;
+    --grape-light:#b38be6;
+    --grape-empty:#ece1f3;
+    --leaf:#5fa463;
+    --leaf-dark:#3f7a45;
+    --stem:#8b5a2b;
+    --good:#3a8a5e;
+    --bad:#c0533f;
+    --warn:#d68a2a;
+    --usd:#3a6dc4;
+    --eur:#7a4cc7;
+    --jpy:#d97742;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.55 -apple-system,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",Segoe UI,Roboto,sans-serif}
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(circle at 20% 30%, rgba(122,63,176,.05), transparent 40%),
+                     radial-gradient(circle at 80% 70%, rgba(95,164,99,.05), transparent 40%);
+  }
+  a{color:var(--grape);text-decoration:none}
+  a:hover{text-decoration:underline}
+  header{position:relative;z-index:1;padding:22px 22px 8px;text-align:center}
+  header h1{
+    font-size:30px;margin:0;letter-spacing:-.02em;
+    background:linear-gradient(135deg,#7a3fb0,#b85d8a);
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800
+  }
+  header h1 .seed{display:inline-block;transform:translateY(2px) rotate(-8deg);font-size:26px;-webkit-text-fill-color:initial}
+  header .tagline{color:var(--muted);font-size:13px;margin-top:4px}
+  header .today{color:var(--grape);font-size:12px;margin-top:6px;font-weight:600}
+  main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:14px 18px 40px;display:grid;gap:18px}
+  .grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+  @media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+  section{
+    background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;
+    box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 2px 10px rgba(122,63,176,.04);
+  }
+  section h2{font-size:13px;margin:0 0 12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+  section h2 .emoji{filter:saturate(1.2)}
+
+  /* ===== 포도송이 ===== */
+  .grape-board{
+    background:linear-gradient(180deg,#fffaf0 0%, #fdf1e0 100%);
+    border:2px dashed #e7b8c8;
+  }
+  .grape-board .head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+  .grape-board .month{font-size:18px;font-weight:700;color:var(--grape)}
+  .grape-board .stat{font-size:12px;color:var(--muted)}
+  .grape-board .stat b{color:var(--grape);font-size:14px}
+  .grape-svg{display:block;margin:6px auto 0;max-width:100%;height:auto}
+  .grape-circle{transition:all .25s ease;cursor:default}
+  .grape-circle.partial{filter:drop-shadow(0 1px 2px rgba(122,63,176,.2))}
+  .grape-circle.full{filter:drop-shadow(0 2px 4px rgba(122,63,176,.45))}
+  .grape-circle.today{stroke:#d68a2a;stroke-width:2.5px;stroke-dasharray:4 3}
+  .grape-num{font-size:9px;fill:#fff;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:central}
+  .grape-num.empty{fill:#b8a3c9}
+  .legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+  .legend .sw{width:12px;height:12px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:5px}
+
+  .toast{
+    position:fixed;left:50%;top:24px;transform:translate(-50%,-30px);opacity:0;
+    background:linear-gradient(135deg,#7a3fb0,#b85d8a);color:#fff;padding:12px 22px;border-radius:999px;
+    font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(122,63,176,.4);z-index:1000;transition:all .4s ease;pointer-events:none
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* ===== References ===== */
+  .ref-list{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 18px}
+  @media (max-width:700px){.ref-list{grid-template-columns:1fr}}
+  .ref-list .group{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:8px;font-weight:700}
+  .ref-list a{display:block;padding:3px 0}
+
+  /* ===== 요약 카드 ===== */
+  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:700px){.summary{grid-template-columns:1fr}}
+  .ccy-card{
+    background:#fffefb;border:1px solid var(--line2);border-radius:12px;padding:14px;
+    border-top:3px solid #ddd;
+  }
+  .ccy-card.usd{border-top-color:var(--usd)}
+  .ccy-card.eur{border-top-color:var(--eur)}
+  .ccy-card.jpy{border-top-color:var(--jpy)}
+  .ccy-card .name{font-weight:700;font-size:14px;margin-bottom:6px}
+  .ccy-card .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+  .ccy-card .row b{color:var(--ink);font-weight:600}
+
+  /* ===== 체크리스트 ===== */
+  .checklist{list-style:none;padding:0;margin:0}
+  .checklist li{padding:8px 0;border-bottom:1px dashed var(--line2);display:flex;gap:10px;align-items:flex-start}
+  .checklist li:last-child{border-bottom:0}
+  .checklist input[type=checkbox]{
+    appearance:none;-webkit-appearance:none;width:20px;height:20px;border:2px solid #c9b3d8;border-radius:50%;
+    cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .15s
+  }
+  .checklist input[type=checkbox]:hover{border-color:var(--grape)}
+  .checklist input[type=checkbox]:checked{background:radial-gradient(circle,var(--grape) 35%,var(--grape-light) 70%);border-color:var(--grape)}
+  .checklist input[type=checkbox]:checked + label{color:var(--muted);text-decoration:line-through}
+  .checklist label{cursor:pointer;flex:1}
+  .check-meta{margin-top:10px;font-size:12px;color:var(--muted)}
+  .check-meta.done{color:var(--good);font-weight:600}
+
+  /* ===== 폼 ===== */
+  form .row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:10px;margin-bottom:8px}
+  form input,form select,form textarea{
+    width:100%;background:#fffefb;border:1px solid var(--line);color:var(--ink);
+    padding:8px 10px;border-radius:8px;font:inherit
+  }
+  form input:focus,form select:focus,form textarea:focus{outline:none;border-color:var(--grape);box-shadow:0 0 0 3px rgba(122,63,176,.12)}
+  form textarea{min-height:54px;resize:vertical}
+  .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  button{
+    background:linear-gradient(135deg,#7a3fb0,#9b5cc8);color:#fff;border:0;
+    padding:9px 16px;border-radius:8px;cursor:pointer;font:inherit;font-weight:600;
+    box-shadow:0 2px 6px rgba(122,63,176,.25);transition:transform .1s
+  }
+  button:hover{transform:translateY(-1px)}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);box-shadow:none}
+  button.danger{background:transparent;border:1px solid #e3a89a;color:var(--bad);box-shadow:none}
+
+  /* ===== 테이블 ===== */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line2)}
+  th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:left}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  td.note{color:var(--muted);font-size:12px}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600}
+  .pill.usd{background:rgba(58,109,196,.13);color:var(--usd)}
+  .pill.eur{background:rgba(122,76,199,.13);color:var(--eur)}
+  .pill.jpy{background:rgba(217,119,66,.13);color:var(--jpy)}
+  .pill.buy{background:rgba(58,138,94,.13);color:var(--good)}
+  .pill.sell{background:rgba(192,83,63,.13);color:var(--bad)}
+  .empty{color:var(--muted);font-size:12px;text-align:center;padding:18px}
+  .delete-btn{background:transparent;border:0;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:16px;box-shadow:none}
+  .delete-btn:hover{color:var(--bad);transform:none}
+
+  .footer-note{text-align:center;color:var(--muted);font-size:11px;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <h1><span class="seed">🍇</span> 방뎅Forex</h1>
+  <div class="tagline">매일 룰을 지키면 포도알이 한 알씩 익어요</div>
+  <div class="today" id="today"></div>
+</header>
+
+<main>
+
+  <!-- 포도송이 보드 -->
+  <section class="grape-board">
+    <div class="head">
+      <div>
+        <div class="month" id="month-label"></div>
+        <div class="stat">이번 달 칭찬 스티커 — <b id="stat-full">0</b>알 익음 · <b id="stat-partial">0</b>알 자라는 중 · 남은 빈 알 <b id="stat-empty">0</b></div>
+      </div>
+      <div class="stat">총 룰 6개 · <b>모두 체크 = 잘 익은 포도</b> · <b>일부만 체크 = 자라는 중</b></div>
+    </div>
+    <svg id="grape-svg" class="grape-svg" viewBox="0 0 360 300" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--grape-empty);border:1px dashed #c9b3d8"></span>아직 빈 알</span>
+      <span><span class="sw" style="background:var(--grape-light)"></span>자라는 중 (1~5/6)</span>
+      <span><span class="sw" style="background:var(--grape)"></span>잘 익은 포도 (6/6)</span>
+      <span><span class="sw" style="border:2px dashed var(--warn);background:transparent"></span>오늘</span>
+    </div>
+  </section>
+
+  <!-- References -->
+  <section>
+    <h2><span class="emoji">📰</span> References — 오늘의 시장 체크</h2>
+    <div class="ref-list">
+      <div class="group">한국 / 환율 공시</div>
+      <a href="https://obank.kbstar.com/quics?page=C101424" target="_blank" rel="noopener">KB국민은행 — 외화 환율 / 우대 조회</a>
+      <a href="https://spot.wooribank.com/pot/Dream?withyou=FXXRT0016" target="_blank" rel="noopener">우리은행 — 환율 정보</a>
+      <a href="https://www.bok.or.kr/portal/main/contents.do?menuNo=200643" target="_blank" rel="noopener">한국은행 — 경제 통계 / 환율</a>
+      <a href="https://www.smbs.biz/ExRate/StdExRate.jsp" target="_blank" rel="noopener">서울외국환중개 — 매매 기준율</a>
+
+      <div class="group">매크로 · 통화 정책</div>
+      <a href="https://www.federalreserve.gov/newsevents.htm" target="_blank" rel="noopener">Federal Reserve — News & Events (FOMC)</a>
+      <a href="https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html" target="_blank" rel="noopener">ECB — Governing Council Calendar</a>
+      <a href="https://www.boj.or.jp/en/about/calendar/index.htm" target="_blank" rel="noopener">Bank of Japan — Schedule</a>
+      <a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener">Investing.com — Economic Calendar</a>
+
+      <div class="group">신뢰 가능 보도</div>
+      <a href="https://www.reuters.com/markets/currencies/" target="_blank" rel="noopener">Reuters — Currencies</a>
+      <a href="https://www.bloomberg.com/markets/currencies" target="_blank" rel="noopener">Bloomberg — Currencies</a>
+      <a href="https://www.ft.com/currencies" target="_blank" rel="noopener">Financial Times — Currencies</a>
+      <a href="https://www.wsj.com/market-data/currencies" target="_blank" rel="noopener">WSJ — Currencies</a>
+
+      <div class="group">국내 경제지</div>
+      <a href="https://www.hankyung.com/finance/forex" target="_blank" rel="noopener">한국경제 — 외환</a>
+      <a href="https://www.mk.co.kr/news/economy/" target="_blank" rel="noopener">매일경제 — 경제</a>
+      <a href="https://www.yna.co.kr/economy/finance" target="_blank" rel="noopener">연합뉴스 — 금융</a>
+
+      <div class="group">차트 / 데이터</div>
+      <a href="https://www.tradingview.com/symbols/USDKRW/" target="_blank" rel="noopener">TradingView — USD/KRW</a>
+      <a href="https://www.tradingview.com/symbols/EURKRW/" target="_blank" rel="noopener">TradingView — EUR/KRW</a>
+      <a href="https://www.tradingview.com/symbols/JPYKRW/" target="_blank" rel="noopener">TradingView — JPY/KRW</a>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section>
+      <h2><span class="emoji">✅</span> 오늘의 룰 체크리스트</h2>
+      <ul class="checklist" id="checklist">
+        <li><input type="checkbox" id="c1" data-key="rule-fee"><label for="c1">수수료 우대 80% 이상 확인했다</label></li>
+        <li><input type="checkbox" id="c2" data-key="rule-trigger"><label for="c2">매수 트리거 충족 (20일 이평 이하 / 평균 단가 이하 등)</label></li>
+        <li><input type="checkbox" id="c3" data-key="rule-once"><label for="c3">오늘 매수는 1통화, 1회만</label></li>
+        <li><input type="checkbox" id="c4" data-key="rule-limit"><label for="c4">회당 한도 이내 (USD 50만 / EUR·JPY 25만)</label></li>
+        <li><input type="checkbox" id="c5" data-key="rule-event"><label for="c5">FOMC / ECB / BOJ 등 빅 이벤트 없음</label></li>
+        <li><input type="checkbox" id="c6" data-key="rule-record"><label for="c6">매수 후 기록 작성 완료</label></li>
+      </ul>
+      <div class="check-meta" id="checklist-meta"></div>
+    </section>
+
+    <section>
+      <h2><span class="emoji">📊</span> 포트폴리오 요약</h2>
+      <div class="summary" id="summary"></div>
+    </section>
+  </div>
+
+  <section>
+    <h2><span class="emoji">✏️</span> 거래 입력</h2>
+    <form id="trade-form">
+      <div class="grid-2">
+        <div>
+          <div class="row"><label>날짜</label><input type="date" id="f-date" required></div>
+          <div class="row"><label>통화</label>
+            <select id="f-ccy" required>
+              <option value="USD">USD (달러)</option>
+              <option value="EUR">EUR (유로)</option>
+              <option value="JPY">JPY (엔, 1엔 기준)</option>
+            </select>
+          </div>
+          <div class="row"><label>구분</label>
+            <select id="f-side" required>
+              <option value="BUY">매수</option>
+              <option value="SELL">매도</option>
+            </select>
+          </div>
+          <div class="row"><label>적용 환율</label><input type="number" id="f-rate" step="0.0001" required placeholder="예) USD 1380.50 / JPY 9.45"></div>
+        </div>
+        <div>
+          <div class="row"><label>원화 금액</label><input type="number" id="f-krw" step="1" required placeholder="500000"></div>
+          <div class="row"><label>수수료 우대</label><input type="number" id="f-fee" step="1" min="0" max="100" required placeholder="80" value="80"></div>
+          <div class="row"><label>은행</label><input type="text" id="f-bank" placeholder="KB / 우리 / 신한 등"></div>
+          <div class="row" style="grid-template-columns:110px 1fr;align-items:flex-start"><label>메모</label><textarea id="f-note" placeholder="매수 사유, 환율 위치 등"></textarea></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit">기록 추가하기</button>
+        <button type="button" class="ghost" id="reset-form">초기화</button>
+      </div>
+    </form>
+  </section>
+
+  <section>
+    <h2><span class="emoji">📒</span> 거래 내역</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>날짜</th><th>통화</th><th>구분</th>
+          <th>환율</th><th>외화</th><th>원화</th><th>우대</th><th>메모</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="trades-body"></tbody>
+    </table>
+    <div class="actions" style="margin-top:14px">
+      <button class="ghost" id="export-json">JSON 내보내기</button>
+      <button class="ghost" id="import-json">JSON 가져오기</button>
+      <button class="ghost" id="export-csv">CSV 내보내기</button>
+      <button class="danger" id="clear-all">전체 삭제</button>
+      <input type="file" id="import-file" accept=".json" hidden>
+    </div>
+  </section>
+
+  <div class="footer-note">방뎅Forex · 데이터는 이 브라우저에만 저장돼요 (localStorage)</div>
+
+</main>
+
+<script>
+const STORAGE_KEY = "fx-tracker-v1";
+const CHECK_KEY = "fx-tracker-check-v1";
+const TOTAL_RULES = 6;
+
+const pad2 = n => String(n).padStart(2,"0");
+const dateKey = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const todayStr = () => dateKey(new Date());
+
+document.getElementById("today").textContent = `오늘은 ${todayStr()}`;
+document.getElementById("f-date").value = todayStr();
+
+function loadTrades(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+function saveTrades(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+function loadChecks(){ try { return JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; } catch { return {}; } }
+function saveChecks(o){ localStorage.setItem(CHECK_KEY, JSON.stringify(o)); }
+
+function fmtNum(n, digits=2){
+  if (n == null || isNaN(n)) return "-";
+  return Number(n).toLocaleString("ko-KR",{maximumFractionDigits:digits, minimumFractionDigits:digits});
+}
+function fmtInt(n){ return n == null || isNaN(n) ? "-" : Math.round(n).toLocaleString("ko-KR"); }
+
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> el.classList.remove("show"), 2400);
+}
+
+/* ===== 포도송이 렌더 ===== */
+const CLUSTER_ROWS = [
+  {count:7, offset:0   },
+  {count:7, offset:0   },
+  {count:6, offset:0.5 },
+  {count:5, offset:1   },
+  {count:4, offset:1.5 },
+  {count:3, offset:2   },
+  {count:2, offset:2.5 },
+  {count:1, offset:3   }
+];
+function buildClusterPositions(){
+  const positions = [];
+  const sx = 38, sy = 30;            // spacing
+  const padX = 35, padY = 50;
+  CLUSTER_ROWS.forEach((row, ri)=>{
+    for (let i=0; i<row.count; i++){
+      positions.push({ cx: padX + (row.offset + i) * sx, cy: padY + ri * sy });
+    }
+  });
+  return positions;
+}
+
+function renderGrapes(){
+  const now = new Date();
+  const year = now.getFullYear(), month = now.getMonth();
+  const monthLabel = `${year}년 ${month+1}월 포도송이`;
+  document.getElementById("month-label").textContent = monthLabel;
+
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const positions = buildClusterPositions();
+  const checks = loadChecks();
+  const today = todayStr();
+
+  const svg = document.getElementById("grape-svg");
+  const NS = "http://www.w3.org/2000/svg";
+  svg.innerHTML = "";
+
+  // 줄기 + 잎
+  const stem = document.createElementNS(NS,"path");
+  stem.setAttribute("d","M 175 10 Q 180 30 165 50");
+  stem.setAttribute("stroke","var(--stem)");
+  stem.setAttribute("stroke-width","3");
+  stem.setAttribute("fill","none");
+  stem.setAttribute("stroke-linecap","round");
+  svg.appendChild(stem);
+
+  const leaf = document.createElementNS(NS,"path");
+  leaf.setAttribute("d","M 178 18 Q 215 8 230 28 Q 220 42 195 38 Q 180 32 178 18 Z");
+  leaf.setAttribute("fill","var(--leaf)");
+  leaf.setAttribute("stroke","var(--leaf-dark)");
+  leaf.setAttribute("stroke-width","1.2");
+  svg.appendChild(leaf);
+  const veins = document.createElementNS(NS,"path");
+  veins.setAttribute("d","M 200 22 Q 205 28 200 35 M 215 18 Q 213 28 207 32");
+  veins.setAttribute("stroke","var(--leaf-dark)");
+  veins.setAttribute("stroke-width","0.8");
+  veins.setAttribute("fill","none");
+  veins.setAttribute("opacity","0.6");
+  svg.appendChild(veins);
+
+  let fullCount = 0, partialCount = 0, emptyCount = 0;
+
+  for (let day = 1; day <= daysInMonth; day++){
+    const pos = positions[day-1];
+    if (!pos) break;
+    const key = `${year}-${pad2(month+1)}-${pad2(day)}`;
+    const dayChecks = checks[key] || {};
+    const done = Object.values(dayChecks).filter(Boolean).length;
+    const ratio = done / TOTAL_RULES;
+
+    let fill, klass = "grape-circle";
+    if (done >= TOTAL_RULES){ fill = "var(--grape)"; klass += " full"; fullCount++; }
+    else if (done > 0){
+      const t = ratio;
+      fill = `rgb(${Math.round(236 - (236-179)*t)}, ${Math.round(225 - (225-139)*t)}, ${Math.round(243 - (243-230)*t)})`;
+      klass += " partial"; partialCount++;
+    } else { fill = "var(--grape-empty)"; emptyCount++; }
+
+    const c = document.createElementNS(NS,"circle");
+    c.setAttribute("cx", pos.cx);
+    c.setAttribute("cy", pos.cy);
+    c.setAttribute("r", 14);
+    c.setAttribute("fill", fill);
+    c.setAttribute("stroke", done >= TOTAL_RULES ? "#5a2890" : "#c9b3d8");
+    c.setAttribute("stroke-width", done >= TOTAL_RULES ? 1.5 : 1);
+    c.setAttribute("class", klass + (key === today ? " today" : ""));
+    c.setAttribute("data-day", day);
+
+    const title = document.createElementNS(NS,"title");
+    title.textContent = `${key} — ${done}/${TOTAL_RULES} 룰 완료${done>=TOTAL_RULES?" 🍇 잘 익었어요!":""}`;
+    c.appendChild(title);
+    svg.appendChild(c);
+
+    // 하이라이트 (잘 익은 알에 광택)
+    if (done >= TOTAL_RULES){
+      const sh = document.createElementNS(NS,"ellipse");
+      sh.setAttribute("cx", pos.cx - 4);
+      sh.setAttribute("cy", pos.cy - 5);
+      sh.setAttribute("rx", 4); sh.setAttribute("ry", 2.5);
+      sh.setAttribute("fill","rgba(255,255,255,.55)");
+      sh.setAttribute("pointer-events","none");
+      svg.appendChild(sh);
+    }
+
+    const txt = document.createElementNS(NS,"text");
+    txt.setAttribute("x", pos.cx);
+    txt.setAttribute("y", pos.cy + 0.5);
+    txt.setAttribute("class", "grape-num" + (done===0?" empty":""));
+    if (done >= TOTAL_RULES) txt.setAttribute("fill","#fff");
+    else if (done > 0) txt.setAttribute("fill","#5a2890");
+    txt.textContent = day;
+    svg.appendChild(txt);
+  }
+
+  document.getElementById("stat-full").textContent = fullCount;
+  document.getElementById("stat-partial").textContent = partialCount;
+  document.getElementById("stat-empty").textContent = emptyCount;
+
+  // viewBox 자동 맞춤
+  const maxRow = CLUSTER_ROWS.length;
+  svg.setAttribute("viewBox", `0 0 360 ${50 + maxRow * 30 + 20}`);
+}
+
+/* ===== 요약/거래 ===== */
+function renderSummary(trades){
+  const summary = {USD:{krw:0,fx:0,buys:0,sells:0,sellKrw:0,sellFx:0}, EUR:{krw:0,fx:0,buys:0,sells:0,sellKrw:0,sellFx:0}, JPY:{krw:0,fx:0,buys:0,sells:0,sellKrw:0,sellFx:0}};
+  trades.forEach(t=>{
+    const s = summary[t.ccy]; if(!s) return;
+    const fx = t.krw / t.rate;
+    if (t.side === "BUY"){ s.krw += t.krw; s.fx += fx; s.buys++; }
+    else { s.sellKrw += t.krw; s.sellFx += fx; s.sells++; }
+  });
+  const root = document.getElementById("summary");
+  root.innerHTML = "";
+  ["USD","EUR","JPY"].forEach(ccy=>{
+    const s = summary[ccy];
+    const netFx = s.fx - s.sellFx;
+    const netKrw = s.krw - s.sellKrw;
+    const avg = netFx > 0 ? (netKrw / netFx) : 0;
+    const card = document.createElement("div");
+    card.className = `ccy-card ${ccy.toLowerCase()}`;
+    card.innerHTML = `
+      <div class="name">${ccy}</div>
+      <div class="row"><span>보유 외화</span><b>${fmtNum(netFx, ccy==="JPY"?0:2)}</b></div>
+      <div class="row"><span>누적 매수 KRW</span><b>${fmtInt(s.krw)}</b></div>
+      <div class="row"><span>평균 단가</span><b>${avg ? fmtNum(avg, 4) : "-"}</b></div>
+      <div class="row"><span>매수 / 매도</span><b>${s.buys} / ${s.sells}</b></div>
+    `;
+    root.appendChild(card);
+  });
+}
+
+function renderTrades(trades){
+  const tbody = document.getElementById("trades-body");
+  tbody.innerHTML = "";
+  if (!trades.length){
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">아직 기록이 없어요. 첫 거래를 추가해 보세요 🍇</td></tr>`;
+    return;
+  }
+  trades.slice().sort((a,b)=> b.date.localeCompare(a.date) || (b.id - a.id)).forEach(t=>{
+    const fx = t.krw / t.rate;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${t.date}</td>
+      <td><span class="pill ${t.ccy.toLowerCase()}">${t.ccy}</span></td>
+      <td><span class="pill ${t.side==="BUY"?"buy":"sell"}">${t.side==="BUY"?"매수":"매도"}</span></td>
+      <td>${fmtNum(t.rate, 4)}</td>
+      <td>${fmtNum(fx, t.ccy==="JPY"?0:2)}</td>
+      <td>${fmtInt(t.krw)}</td>
+      <td>${t.fee}%</td>
+      <td class="note">${(t.bank?`[${t.bank}] `:"")+(t.note||"")}</td>
+      <td><button class="delete-btn" data-id="${t.id}" title="삭제">×</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function render(){
+  const trades = loadTrades();
+  renderSummary(trades);
+  renderTrades(trades);
+  renderGrapes();
+}
+
+/* ===== 폼/액션 ===== */
+document.getElementById("trade-form").addEventListener("submit", e=>{
+  e.preventDefault();
+  const t = {
+    id: Date.now(),
+    date: document.getElementById("f-date").value,
+    ccy: document.getElementById("f-ccy").value,
+    side: document.getElementById("f-side").value,
+    rate: parseFloat(document.getElementById("f-rate").value),
+    krw: parseFloat(document.getElementById("f-krw").value),
+    fee: parseFloat(document.getElementById("f-fee").value),
+    bank: document.getElementById("f-bank").value.trim(),
+    note: document.getElementById("f-note").value.trim()
+  };
+  if (t.fee < 80 && t.side === "BUY"){
+    if (!confirm("수수료 우대가 80% 미만입니다. 정말 기록할까요?")) return;
+  }
+  const list = loadTrades(); list.push(t); saveTrades(list);
+  document.getElementById("f-rate").value = "";
+  document.getElementById("f-krw").value = "";
+  document.getElementById("f-note").value = "";
+  showToast("기록 추가 완료 🍇");
+  render();
+});
+
+document.getElementById("reset-form").addEventListener("click", ()=>{
+  document.getElementById("trade-form").reset();
+  document.getElementById("f-date").value = todayStr();
+  document.getElementById("f-fee").value = 80;
+});
+
+document.getElementById("trades-body").addEventListener("click", e=>{
+  if (e.target.classList.contains("delete-btn")){
+    const id = Number(e.target.dataset.id);
+    if (!confirm("이 기록을 삭제할까요?")) return;
+    saveTrades(loadTrades().filter(t=>t.id !== id));
+    render();
+  }
+});
+
+document.getElementById("clear-all").addEventListener("click", ()=>{
+  if (!confirm("모든 거래 내역을 삭제합니다. 계속할까요?")) return;
+  saveTrades([]); render();
+});
+
+document.getElementById("export-json").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify({trades:loadTrades(), checks:loadChecks()}, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `bangdeng-forex-${todayStr()}.json`; a.click();
+});
+
+document.getElementById("export-csv").addEventListener("click", ()=>{
+  const rows = [["date","ccy","side","rate","fx","krw","fee","bank","note"]];
+  loadTrades().forEach(t=>{
+    rows.push([t.date,t.ccy,t.side,t.rate,(t.krw/t.rate).toFixed(4),t.krw,t.fee,t.bank||"",(t.note||"").replace(/[\r\n,]/g," ")]);
+  });
+  const csv = rows.map(r=>r.join(",")).join("\n");
+  const blob = new Blob(["﻿"+csv], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `bangdeng-forex-${todayStr()}.csv`; a.click();
+});
+
+document.getElementById("import-json").addEventListener("click", ()=> document.getElementById("import-file").click());
+document.getElementById("import-file").addEventListener("change", e=>{
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try {
+      const data = JSON.parse(ev.target.result);
+      const trades = Array.isArray(data) ? data : data.trades;
+      if (!Array.isArray(trades)) throw new Error("거래 배열이 없습니다");
+      if (!confirm(`${trades.length}건을 가져옵니다. 기존 기록에 추가할까요? (취소 시 덮어쓰기)`)){
+        saveTrades(trades);
+      } else {
+        saveTrades(loadTrades().concat(trades));
+      }
+      if (data.checks) saveChecks(Object.assign(loadChecks(), data.checks));
+      render();
+    } catch(err){ alert("가져오기 실패: " + err.message); }
+  };
+  reader.readAsText(file);
+});
+
+/* ===== 체크리스트 ===== */
+const checklist = document.getElementById("checklist");
+const checkMeta = document.getElementById("checklist-meta");
+function refreshCheckMeta(){
+  const state = loadChecks(); const today = todayStr();
+  const day = state[today] || {};
+  const total = checklist.querySelectorAll("input").length;
+  const done = Object.values(day).filter(Boolean).length;
+  checkMeta.textContent = `오늘 (${today}) — ${done}/${total} 완료${done===total?" 🍇 오늘의 포도알이 잘 익었어요!":""}`;
+  checkMeta.classList.toggle("done", done===total);
+}
+checklist.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+  const today = todayStr();
+  const state = loadChecks(); cb.checked = !!(state[today] && state[today][cb.dataset.key]);
+  cb.addEventListener("change", ()=>{
+    const s = loadChecks(); s[today] = s[today] || {}; s[today][cb.dataset.key] = cb.checked;
+    saveChecks(s);
+    refreshCheckMeta();
+    renderGrapes();
+    const day = s[today]; const done = Object.values(day).filter(Boolean).length;
+    if (done === TOTAL_RULES && cb.checked) showToast("🍇 오늘의 포도알이 잘 익었어요!");
+  });
+});
+refreshCheckMeta();
+
+render();
+</script>
+</body>
+</html>
